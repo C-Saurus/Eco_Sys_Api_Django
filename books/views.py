@@ -78,7 +78,7 @@ class WriteApiView(APIView):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def createCate(request, *args, **kwargs):
     serializer = CategorySerializer(data=request.data)
     if serializer.is_valid():
