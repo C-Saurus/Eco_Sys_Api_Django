@@ -89,20 +89,13 @@ WSGI_APPLICATION = "Ecom_Sys.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "djongo",
-        "NAME": "eco_system",
-        "ENFORCE_SCHEMA": False,
-        "CLIENT": {
-            "host": "mongodb+srv://DatVuHuu:xxx.@cluster0.bmdxrvy.mongodb.net/?retryWrites=true&w=majority"
-        },
-    },
+    "default": {},
     "mongo_db": {
         "ENGINE": "djongo",
         "NAME": "eco_system",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
-            "host": "mongodb+srv://DatVuHuu:xxx.@cluster0.bmdxrvy.mongodb.net/?retryWrites=true&w=majority"
+            "host": "mongodb+srv://DatVuHuu:Matkhaumoi111.@cluster0.bmdxrvy.mongodb.net/?retryWrites=true&w=majority"
         },
     },
     "mysql": {
@@ -176,3 +169,8 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=10),
 }
+
+AUTHENTICATION_BACKENDS = [
+    "user.serializers.CustomAuthBackend",
+    "django.contrib.auth.backends.ModelBackend",  # Giữ lại backend mặc định
+]
