@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
-from .models import Item, Category
-from .serializers import ItemSerializer, CategorySerializer
+from .models import Item, Category, Author
+from .serializers import ItemSerializer, CategorySerializer, AuthorSerializer
 
 
 # Create your views here.
@@ -19,8 +19,9 @@ def getAllBook(*args, **kwargs):
 
 @api_view(["GET"])
 def getDetail(request, id, *args, **kwargs):
-    book_instance = Item.objects.get(id=id)
-    if not book_instance:
+    try:
+        book_instance = Item.objects.get(id=id)
+    except:
         return Response(
             {"res": "Book with id does not exists"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -31,9 +32,34 @@ def getDetail(request, id, *args, **kwargs):
 
 
 @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
 def createBook(request, *args, **kwargs):
     serializer = ItemSerializer(data=request.data)
+    try:
+        Category.objects.get(id=request.data.get("category"))
+    except:
+        return Response(
+            {"res": "Category with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        Author.objects.get(id=request.data.get("author"))
+    except:
+        return Response(
+            {"res": "Author with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def createAuthor(request, *args, **kwargs):
+    serializer = AuthorSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -42,16 +68,14 @@ def createBook(request, *args, **kwargs):
 
 
 class WriteApiView(APIView):
-    # add permission to check if user is authenticated
-    permission_classes = [permissions.IsAuthenticated]
-
     # 1. Update
     def put(self, request, id, *args, **kwargs):
         """
         Updates the todo item with given id if exists
         """
-        book = Item.objects.get(id=id)
-        if not book:
+        try:
+            book = Item.objects.get(id=id)
+        except:
             return Response(
                 {"res": "Object with book id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -92,4 +116,11 @@ def createCate(request, *args, **kwargs):
 def getAllCate(request, *args, **kwargs):
     cates = Category.objects.all()
     serializer = CategorySerializer(cates, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def getAllAuthor(request, *args, **kwargs):
+    cates = Author.objects.all()
+    serializer = AuthorSerializer(cates, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

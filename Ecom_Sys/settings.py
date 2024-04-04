@@ -89,7 +89,14 @@ WSGI_APPLICATION = "Ecom_Sys.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {},
+    "default": {
+        "ENGINE": "djongo",
+        "NAME": "eco_system",
+        "ENFORCE_SCHEMA": False,
+        "CLIENT": {
+            "host": "mongodb+srv://DatVuHuu:Matkhaumoi111.@cluster0.bmdxrvy.mongodb.net/?retryWrites=true&w=majority"
+        },
+    },
     "mongo_db": {
         "ENGINE": "djongo",
         "NAME": "eco_system",

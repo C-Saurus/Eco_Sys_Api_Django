@@ -12,6 +12,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework import status
 from datetime import datetime
 from django.contrib.auth import get_user_model
+from utils.index import checkAuthToken
 
 User = get_user_model()
 
@@ -96,23 +97,9 @@ def login(request):
 @permission_classes([IsAuthenticated])
 def logout(request):
     access_token = request.META.get("HTTP_AUTHORIZATION", "").split(" ")[1]
-    try:
-        decoded_access_token = AccessToken(access_token)
-    except TokenError:
-        return Response(
-            {"error": "Invalid access token"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    if decoded_access_token["exp"] < datetime.now().timestamp():
-        BlackList.objects.create(token=access_token)
-        return Response(
-            {"error": "Access token has expired"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    tokenExpired = BlackList.objects.get(token=access_token)
-    print(tokenExpired)
-    if tokenExpired is not None:
-        return Response(
-            {"error": "Access token has expired"}, status=status.HTTP_401_UNAUTHORIZED
-        )
+    checkStatus = checkAuthToken(access_token)
+    if checkStatus != "OK":
+        return Response({"error": checkStatus}, status=status.HTTP_401_UNAUTHORIZED)
     BlackList.objects.create(token=access_token)
     return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 
@@ -121,22 +108,14 @@ def logout(request):
 @permission_classes([IsAuthenticated])
 def getUser(request, id):
     access_token = request.META.get("HTTP_AUTHORIZATION", "").split(" ")[1]
+    checkStatus = checkAuthToken(access_token)
+    if checkStatus != "OK":
+        return Response({"error": checkStatus}, status=status.HTTP_401_UNAUTHORIZED)
     try:
-        decoded_access_token = AccessToken(access_token)
-    except TokenError:
+        user_instance = User.objects.get(id=id)
+    except:
         return Response(
-            {"error": "Invalid access token"}, status=status.HTTP_401_UNAUTHORIZED
+            {"error": "User with id is not exist"}, status=status.HTTP_400_BAD_REQUEST
         )
-    if decoded_access_token["exp"] < datetime.now().timestamp():
-        BlackList.objects.create(token=access_token)
-        return Response(
-            {"error": "Access token has expired"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    tokenExpired = BlackList.objects.get(token=access_token)
-    if tokenExpired is not None:
-        return Response(
-            {"error": "Access token has expired"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    user_instance = User.objects.get(id=id)
     serializer = UserSerializer(user_instance)
     return Response(serializer.data, status=status.HTTP_200_OK)
