@@ -13,6 +13,12 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = "__all__"
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["brand"] = BrandSerializer(instance.brand).data
+        representation["category"] = CategorySerializer(instance.category).data
+        return representation
+
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:

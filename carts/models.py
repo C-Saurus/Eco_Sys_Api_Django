@@ -14,7 +14,4 @@ class Item(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"Cart #{self.id}: {self.quantity} x {self.cate} - {self.id_product}"
+    status = models.CharField(max_length=50)  # (added, ordered)

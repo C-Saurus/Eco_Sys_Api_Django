@@ -19,8 +19,9 @@ def getAllPhones(*args, **kwargs):
 
 @api_view(["GET"])
 def getDetail(request, id, *args, **kwargs):
-    item_instance = Item.objects.get(id=id)
-    if not item_instance:
+    try:
+        item_instance = Item.objects.get(id=id)
+    except:
         return Response(
             {"res": "Phones with id does not exists"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -33,6 +34,21 @@ def getDetail(request, id, *args, **kwargs):
 @api_view(["POST"])
 # @permission_classes([IsAuthenticated])
 def createItem(request, *args, **kwargs):
+    try:
+        OperatingSystem.objects.get(id=request.data.get("operating_system"))
+    except:
+        return Response(
+            {"res": "Category with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        Brand.objects.get(id=request.data.get("brand"))
+    except:
+        return Response(
+            {"res": "Brand with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     serializer = ItemSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -47,11 +63,9 @@ class WriteApiView(APIView):
 
     # 1. Update
     def put(self, request, id, *args, **kwargs):
-        """
-        Updates the todo item with given id if exists
-        """
-        item = Item.objects.get(id=id)
-        if not item:
+        try:
+            item = Item.objects.get(id=id)
+        except:
             return Response(
                 {"res": "Object with phone id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -64,11 +78,9 @@ class WriteApiView(APIView):
 
     # 2. Delete
     def delete(self, request, id, *args, **kwargs):
-        """
-        Deletes the todo item with given id if exists
-        """
-        item = Item.objects.get(id=id)
-        if not item:
+        try:
+            item = Item.objects.get(id=id)
+        except:
             return Response(
                 {"res": "Object with phones id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,

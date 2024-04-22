@@ -19,8 +19,9 @@ def getAllClothes(*args, **kwargs):
 
 @api_view(["GET"])
 def getDetail(request, id, *args, **kwargs):
-    item_instance = Item.objects.get(id=id)
-    if not item_instance:
+    try:
+        item_instance = Item.objects.get(id=id)
+    except:
         return Response(
             {"res": "Clothes with id does not exists"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -34,6 +35,21 @@ def getDetail(request, id, *args, **kwargs):
 # @permission_classes([IsAuthenticated])
 def createItem(request, *args, **kwargs):
     serializer = ItemSerializer(data=request.data)
+    try:
+        Category.objects.get(id=request.data.get("category"))
+    except:
+        return Response(
+            {"res": "Category with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        Brand.objects.get(id=request.data.get("brand"))
+    except:
+        return Response(
+            {"res": "Brand with id does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -50,8 +66,9 @@ class WriteApiView(APIView):
         """
         Updates the todo item with given id if exists
         """
-        item = Item.objects.get(id=id)
-        if not item:
+        try:
+            item = Item.objects.get(id=id)
+        except:
             return Response(
                 {"res": "Object with clothes id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -64,9 +81,6 @@ class WriteApiView(APIView):
 
     # 2. Delete
     def delete(self, request, id, *args, **kwargs):
-        """
-        Deletes the todo item with given id if exists
-        """
         item = Item.objects.get(id=id)
         if not item:
             return Response(

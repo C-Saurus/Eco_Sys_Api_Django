@@ -88,11 +88,9 @@ class WriteApiView(APIView):
 
     # 2. Delete
     def delete(self, request, id, *args, **kwargs):
-        """
-        Deletes the todo item with given id if exists
-        """
-        book = Item.objects.get(id=id)
-        if not book:
+        try:
+            book = Item.objects.get(id=id)
+        except:
             return Response(
                 {"res": "Object with book id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "phones",
     "search",
     "carts",
+    "order",
 ]
 
 MIDDLEWARE = [
@@ -120,6 +121,7 @@ DATABASE_ROUTERS = [
     "clothes.routers.ClothesDBRouter",
     "phones.routers.PhonesDBRouter",
     "user.routers.UserDBRouter",
+    "carts.routers.CartDBRouter",
     "carts.routers.CartDBRouter",
 ]
 
